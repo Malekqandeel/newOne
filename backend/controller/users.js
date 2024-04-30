@@ -1,9 +1,11 @@
 const { connection } = require("../models/db");
 
-const register = (req, res) => {
+const register = async (req, res) => {
   const { username, password } = req.body;
+  const bcryptPassword = await bcrypt.hash(password, 7);
+
   const query = "INSERT INTO users (username, password) VALUES (?, ?)";
-  const data = [username, password];
+  const data = [username.toLowerCase(), bcryptPassword];
   connection
     .query(query, data)
     .then((result) => {
