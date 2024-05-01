@@ -1,6 +1,6 @@
 const { connection } = require("../models/db");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const register = async (req, res) => {
   const { username, password } = req.body;
   const bcryptPassword = await bcrypt.hash(password, 7);
@@ -11,8 +11,7 @@ const register = async (req, res) => {
     .query(query, data)
     .then((result) => {
       res.status(201).json({
-        message: "register",
-        result: result
+        message: "register"
       });
     })
     .catch((err) => {
