@@ -81,12 +81,53 @@ const updateTicket = (req,res)=>{
     .catch((err) => {
       throw err;
     });
-  }
+  };
 
 
+const favoriteTicket = (req,res)=>{
+  const {id}=req.params;
+
+  const query ="INSERT INTO favorite (ticket_id) VALUES ?"
+  const data = [id];
+
+  connection
+    .query(query, data)
+    .then((result) => {
+      res.status(201).json({
+        message: "Ticket was updated as favorite",
+        result: result
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+const removeFavoriteTicket = (req,res)=>{
+  const {id}=req.params;
+
+  const query ="DELETE FROM favorite WHERE id =?"
+  const data = [id];
+
+  connection
+    .query(query, data)
+    .then((result) => {
+      res.status(201).json({
+        message: "Ticket was removed as favorite",
+        result: result
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
 
 
 module.exports ={
     createTicket,
-
+    removeFavoriteTicket,
+    updateTicket,
+    deleteTicket,
+    selectTicketForUserId,
+    favoriteTicket
 }
