@@ -1,14 +1,10 @@
-var mysql = require("mysql");
-var connection = mysql.createConnection({
+const mysql = require("mysql");
+const pool = mysql.createPool({
   host: "localhost",
   user: "root",
   password: process.env.PASSWORD,
   database: "todolist",
   port: 3306
 });
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
-module.exports = {connection};
-
+pool.query(console.log("ra shed"));
+module.exports = { pool };

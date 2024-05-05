@@ -90,4 +90,4 @@ const updateUserById = (req, res) => {
       res.json(err);
     });
 };
-module.exports = { register, login, getUserById, updateUserById };
+module.exports = { register, login, getUserById,updateUserById };
