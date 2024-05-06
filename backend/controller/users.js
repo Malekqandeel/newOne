@@ -110,4 +110,4 @@ const updateUserById = (req, res) => {
       console.log(err);
     });
 };
-module.exports = { register, login, getUserById, updateUserById };
+module.exports = { register, login, getUserById,updateUserById };
