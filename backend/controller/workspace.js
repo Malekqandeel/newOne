@@ -1,13 +1,14 @@
-const {connection} =require('../models/db')
+const { pool } = require("../models/db");
 
-const addTicket = (req,res)=>{
-    const {ticket_id} = req.params;
-    const {title,member,photo} = req.body;
+const addTicket = (req, res) => {
+  const { ticket_id } = req.params;
+  const { title, member, photo } = req.body;
 
-    const query ="INSERT INTO workspace (title,ticket_id,members,photo) VALUES (?,?,?,?)";
-    const data =[title,ticket_id,member,photo];
+  const query =
+    "INSERT INTO workspace (title,ticket_id,members,photo) VALUES ($1,$2,$3,$4)";
+  const data = [title, ticket_id, member, photo];
 
-    connection
+  pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -20,13 +21,13 @@ const addTicket = (req,res)=>{
     });
 };
 
-const removeTicket = (req,res)=>{
-    const {ticket_id}= req.params;
+const removeTicket = (req, res) => {
+  const { ticket_id } = req.params;
 
-    const query = "DELETE FROM workspace WHERE ticket_id";
-    const data = [ticket_id];
+  const query = "DELETE FROM workspace WHERE ticket_id";
+  const data = [ticket_id];
 
-    connection
+  pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -39,7 +40,7 @@ const removeTicket = (req,res)=>{
     });
 };
 
-module.exports ={
-    addTicket,
-    removeTicket
-}
+module.exports = {
+  addTicket,
+  removeTicket
+};
