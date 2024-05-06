@@ -13,10 +13,12 @@ const register = async (req, res) => {
     res.status(500).json({ error: "Failed to register user" });
   }
 };
+
+
 const login = (req, res) => {
-  const password = req.body.password;
-  const username = req.body.username;
-  const query = `SELECT * FROM users WHERE username = ?`;
+  const {username} = req.body;
+  const {password} = req.body;
+  const query = `SELECT * FROM users WHERE username = $1`;
   const data = [username.toLowerCase()];
   pool
     .query(query, data)
@@ -26,7 +28,9 @@ const login = (req, res) => {
           if (err) res.json(err);
           if (response) {
             const payload = {
-              test: "test information"
+              userId: result.rows[0].id,
+              country: result.rows[0].country,
+              role: result.rows[0].role_id
             };
             const options = { expiresIn: "1d" };
             const secret = process.env.SECRET;
@@ -44,7 +48,7 @@ const login = (req, res) => {
           } else {
             res.status(403).json({
               success: false,
-              message: `The username doesn’t exist or the password you’ve entered is incorrect`
+              message: `The email doesn’t exist or the password you’ve entered is incorrect`
             });
           }
         });
@@ -54,11 +58,12 @@ const login = (req, res) => {
       res.status(403).json({
         success: false,
         message:
-          "The username doesn’t exist or the password you’ve entered is incorrect",
+          "The email doesn’t exist or the password you’ve entered is incorrect",
         err
       });
     });
 };
+
 const getUserById = (req, res) => {
   const { id } = req.params;
   const query = `SELECT * FROM users WHERE id= ?`;
