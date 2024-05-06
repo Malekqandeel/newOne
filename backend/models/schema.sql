@@ -20,7 +20,7 @@ CREATE TABLE type (
 );
 CREATE TABLE company(
   id INT PRIMARY KEY,
-  email VARCHAR(255),
+  email VARCHAR(255) ,
   username VARCHAR(255),
   password VARCHAR(255),
   role_id INT,
