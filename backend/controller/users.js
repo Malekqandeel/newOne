@@ -2,23 +2,36 @@ const { pool } = require("../models/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const register = async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const bcryptPassword = await bcrypt.hash(password, 7);
-    const query = "INSERT INTO users (username, password) VALUES ($1, $2)";
-    const data = [username.toLowerCase(), bcryptPassword];
-    const result = await pool.query(query, data);
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to register user" });
-  }
+  const { first_name, last_name, email, password } = req.body;
+  const role_id = "1";
+  const bcryptPassword = await bcrypt.hash(password, 7);
+  const query =
+    "INSERT INTO users (first_name,last_name ,email ,password) VALUES ($1,$2,$3,$4) returning *;";
+  const values = [first_name, last_name, email.toLowerCase(), bcryptPassword];
+  pool
+    .query(query, values)
+    .then((result) => {
+      res.status(200).json({
+        success: true,
+        message: "created email successfully",
+        result: result.rows[0]
+      });
+    })
+    .catch((err) => {
+      res.status(409).json({
+        success: false,
+        massage: "The email already exited",
+        err: err.message
+      });
+      console.log(err);
+    });
 };
 
 const login = (req, res) => {
-  const { username } = req.body;
+  const { email } = req.body;
   const { password } = req.body;
-  const query = `SELECT * FROM users WHERE username = $1`;
-  const data = [username.toLowerCase()];
+  const query = `SELECT * FROM users WHERE email  = $1`;
+  const data = [email.toLowerCase()];
   pool
     .query(query, data)
     .then((result) => {
@@ -67,31 +80,34 @@ const getUserById = (req, res) => {
   const { id } = req.params;
   const query = `SELECT * FROM users WHERE id= $1`;
   pool
-    .query(query, id)
+    .query(query, [id])
     .then((result) => {
       res.status(200).json({
         message: `users id = ${id}`,
-        result: result
+        result: result.rows
       });
     })
     .catch((err) => {
-      res.status(500).json(err);
+      res.status(500).json(err.message);
+      console.log(err);
     });
 };
 const updateUserById = (req, res) => {
   const { id } = req.params;
-  const { username, password, type } = req.body;
-  const query = `UPDATE users SET username=$1 ,password =$2,type=$3 WHERE id= $4`;
-  const data = [username, password, type, id];
+  const { email, first_name, last_name } = req.body;
+  const query = `UPDATE users SET email = COALESCE($1, email), first_name = COALESCE($2, first_name), last_name = COALESCE($3, last_name) WHERE id = $4 RETURNING *`;
+  const data = [email, first_name, last_name, id];
   pool
     .query(query, data)
     .then((result) => {
       res.status(202).json({
-        message: `Modified user id =${id}  `
+        message: `Modified user id =${id}  `,
+        result: result.rows
       });
     })
     .catch((err) => {
-      res.json(err);
+      res.json(err.message);
+      console.log(err);
     });
 };
 module.exports = { register, login, getUserById,updateUserById };
