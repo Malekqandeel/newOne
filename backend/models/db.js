@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 const connectionString = process.env.DB_URL;
 const pool = new Pool({
-  connectionString,
+  connectionString
 });
 pool
   .connect()
@@ -9,81 +9,79 @@ pool
     console.log(`DB connected to ${res.database}`);
   })
   .catch((err) => {
-    console.log(err);
+    console.log(err); 
   });
 const createTable = (req, res) => {
   pool
     .query(
-      `CREATE TABLE users (
+      `CREATE TABLE roles (
         id SERIAL PRIMARY KEY,
-        photo VARCHAR,
-        first_name VARCHAR NOT NULL,
-        last_name VARCHAR NOT NULL,
-        username VARCHAR UNIQUE NOT NULL,
-        password VARCHAR(12) NOT NULL,
-        role_id VARCHAR,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (type_id) REFERENCES type(id),
-        FOREIGN KEY (role_id) REFERENCES roles(id)
-        is_deleted SMALLINT DEFAULT 0
+        role VARCHAR(255) NOT NULL
     );
-    CREATE TABLE ticket (
+    
+    CREATE TABLE permissions (
         id SERIAL PRIMARY KEY,
-        photo VARCHAR,
-        cover VARCHAR,
-        user_id INTEGER,
+        permission VARCHAR(255) NOT NULL
+    );
+    
+    CREATE TABLE role_permission (
+        id SERIAL PRIMARY KEY,
+        role_id INT NOT NULL,
+        permission_id INT NOT NULL,
+        FOREIGN KEY (role_id) REFERENCES roles(id),
+        FOREIGN KEY (permission_id) REFERENCES permissions(id)
+    );
+    
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        photo VARCHAR(255),
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role_id INT,
+        is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (role_id) REFERENCES roles(id)
+    );
+    
+    CREATE TABLE tickets (
+        id SERIAL PRIMARY KEY,
+        photo VARCHAR(255),
+        cover VARCHAR(255),
         user_id INT,
         priority VARCHAR(255),
-        created_at TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         end_at TIMESTAMP,
-        FOREIGN Key user_id REFERENCES users(id),
         is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     );
-    CREATE TABLE workspace (
+    
+    CREATE TABLE workspaces (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255),
         ticket_id INT,
-        member INT,
+        member_id INT,
         photo VARCHAR(255),
-        FOREIGN Key member REFERENCES users(id),
-        FOREIGN KEY (ticket_id) REFERENCES ticket(id)
+        is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (ticket_id) REFERENCES tickets(id),
+        FOREIGN KEY (member_id) REFERENCES users(id)
     );
-    CREATE TABLE favorite (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      ticket_id INT,
-      FOREIGN KEY (ticket_id) REFERENCES ticket(id)
+    
+    CREATE TABLE favorites (
+        id SERIAL PRIMARY KEY,
+        ticket_id INT,
+        FOREIGN KEY (ticket_id) REFERENCES tickets(id)
     );
-    CREATE TABLE roles (
-      id SERIAL NOT NULL,
-      role VARCHAR(255) NOT NULL,
-      PRIMARY KEY (id)
-    );
-    CREATE TABLE permissions (
-      id SERIAL NOT NULL,
-      permission VARCHAR(255) NOT NULL,
-      PRIMARY KEY (id)
-    );
-    CREATE TABLE role_permission (
-      id SERIAL NOT NULL,
-      role_id INT,
-      permission_id INT,
-      FOREIGN KEY (role_id) REFERENCES roles(id),
-      FOREIGN KEY (permission_id) REFERENCES permissions(id),
-      PRIMARY KEY (id)
-    );`
+    
+    `
     )
     .then((result) => {
-      res.json({
-        message: "created",
-      });
+      console.log("created");
     })
     .catch((err) => {
-      res.json({
-        err: err.message,
-      });
+      console.log(err.message);
     });
 };
 // createTable()
 
-module.exports = {pool};
-  
+module.exports = { pool };
