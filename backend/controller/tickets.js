@@ -1,4 +1,4 @@
-const {connection} = require('../models/db');
+const {pool} = require('../models/db');
 
 const createTicket = (req,res)=>{
     const {title,
@@ -10,7 +10,7 @@ const createTicket = (req,res)=>{
     const query = "INSERT INTO ticket (title, body,user_id,priority ,photo) VALUES (?,?,?,?,?)";
 
 
-    connection
+    pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -27,7 +27,7 @@ const deleteTicket = (req,res)=>{
   const {id}= req.params;
   const query = "DELETE FROM ticket WHERE id =?"
   const data = [id];
-  connection
+  pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -51,7 +51,7 @@ const updateTicket = (req,res)=>{
     const query = "UPDATE ticket SET title=COALESCE(?,title), body=COALESCE(?,body), priority=COALESCE(?,priority), photo=COALESCE(?,photo) WHERE ticket_id =?";
     const data=[title,body,priority,photo,user_id,ticket_id];
 
-    connection
+    pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -70,7 +70,7 @@ const updateTicket = (req,res)=>{
 
     const data = [user_id];
 
-    connection
+    pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -90,7 +90,7 @@ const favoriteTicket = (req,res)=>{
   const query ="INSERT INTO favorite (ticket_id) VALUES ?"
   const data = [id];
 
-  connection
+  pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
@@ -109,7 +109,7 @@ const removeFavoriteTicket = (req,res)=>{
   const query ="DELETE FROM favorite WHERE id =?"
   const data = [id];
 
-  connection
+  pool
     .query(query, data)
     .then((result) => {
       res.status(201).json({
