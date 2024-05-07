@@ -5,7 +5,7 @@ const addTicket = (req, res) => {
   const { title, member, photo } = req.body;
 
   const query =
-    "INSERT INTO workspace (title,ticket_id,members,photo) VALUES ($1,$2,$3,$4)";
+    "INSERT INTO workspaces (title,ticket_id,member_id,photo) VALUES ($1,$2,$3,$4)";
   const data = [title, ticket_id, member, photo];
 
   pool
@@ -24,7 +24,7 @@ const addTicket = (req, res) => {
 const removeTicket = (req, res) => {
   const { ticket_id } = req.params;
 
-  const query = "DELETE FROM workspace WHERE ticket_id";
+  const query = "DELETE FROM workspaces WHERE ticket_id =$1";
   const data = [ticket_id];
 
   pool
