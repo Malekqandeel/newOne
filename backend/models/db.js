@@ -43,7 +43,19 @@ const createTable = (req, res) => {
         is_deleted SMALLINT DEFAULT 0,
         FOREIGN KEY (role_id) REFERENCES roles(id)
     );
-    
+    CREATE TABLE company(
+      id SERIAL PRIMARY KEY,
+      company_name VARCHAR(255),
+      email VARCHAR(255),
+      password VARCHAR(255),
+      role_id INT ,
+      users_company INT 
+      is_deleted SMALLINT DEFAULT 0 ,
+      FOREIGN KEY (role_id) REFERENCES roles(id),
+      FOREIGN KEY (users_company) REFERENCES users(id)
+
+
+      )
     CREATE TABLE tickets (
         id SERIAL PRIMARY KEY,
         photo VARCHAR(255),

@@ -41,10 +41,9 @@ const login = (req, res) => {
           if (response) {
             const payload = {
               userId: result.rows[0].id,
-              username: result.rows[0].first_name,
+              username: result.rows[0].email,
               role: result.rows[0].role_id
             };
-            console.log(payload);
             const options = { expiresIn: "1d" };
             const secret = process.env.SECRET;
             const token = jwt.sign(payload, secret, options);
@@ -53,7 +52,8 @@ const login = (req, res) => {
                 token,
                 success: true,
                 message: `Valid login credentials`,
-                userId: result.rows[0].id
+                userId: result.rows[0].id,
+                
               });
             } else {
               throw Error;
