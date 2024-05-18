@@ -1,14 +1,99 @@
-var mysql = require("mysql");
-var connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: process.env.PASSWORD,
-  database: "todolist",
-  port: 3306
+const { Pool } = require("pg");
+const connectionString = process.env.DB_URL;
+const pool = new Pool({
+  connectionString
 });
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
-module.exports = {connection};
+pool
+  .connect()
+  .then((res) => {
+    console.log(`DB connected to ${res.database}`);
+  })
+  .catch((err) => {
+    console.log(err); 
+  });
+const createTable = (req, res) => {
+  pool
+    .query(
+      `CREATE TABLE roles (
+        id SERIAL PRIMARY KEY,
+        role VARCHAR(255) NOT NULL
+    );
+    
+    CREATE TABLE permissions (
+        id SERIAL PRIMARY KEY,
+        permission VARCHAR(255) NOT NULL
+    );
+    
+    CREATE TABLE role_permission (
+        id SERIAL PRIMARY KEY,
+        role_id INT NOT NULL,
+        permission_id INT NOT NULL,
+        FOREIGN KEY (role_id) REFERENCES roles(id),
+        FOREIGN KEY (permission_id) REFERENCES permissions(id)
+    );
+    
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        photo VARCHAR(255),
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role_id INT,
+        is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (role_id) REFERENCES roles(id)
+    );
+    CREATE TABLE company(
+      id SERIAL PRIMARY KEY,
+      company_name VARCHAR(255),
+      email VARCHAR(255),
+      password VARCHAR(255),
+      role_id INT ,
+      users_company INT 
+      is_deleted SMALLINT DEFAULT 0 ,
+      FOREIGN KEY (role_id) REFERENCES roles(id),
+      FOREIGN KEY (users_company) REFERENCES users(id)
 
+
+      )
+    CREATE TABLE tickets (
+        id SERIAL PRIMARY KEY,
+        photo VARCHAR(255),
+        cover VARCHAR(255),
+        user_id INT,
+        priority VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        end_at TIMESTAMP,
+        is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    
+    CREATE TABLE workspaces (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255),
+        ticket_id INT,
+        member_id INT,
+        photo VARCHAR(255),
+        is_deleted SMALLINT DEFAULT 0,
+        FOREIGN KEY (ticket_id) REFERENCES tickets(id),
+        FOREIGN KEY (member_id) REFERENCES users(id)
+    );
+    
+    CREATE TABLE favorites (
+        id SERIAL PRIMARY KEY,
+        ticket_id INT,
+        FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+    );
+    
+    `
+    )
+    .then((result) => {
+      console.log("created");
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+};
+//createTable()
+
+module.exports = { pool };
