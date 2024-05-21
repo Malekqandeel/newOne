@@ -1,27 +1,31 @@
 "use client";
 import axios from "axios";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
 import { setUserId } from "../lib/features/auth";
-const handleLogin = (email, password) => {
-  axios
-    .post("http://localhost:5000/users/login", {
-      email,
-      password
-    })
-    .then((result) => {
-      console.log("Login successful:", result.data);
-      dispatch(setUserId.data);
-    })
-    .catch((err) => {
-      console.error(
-        "Login failed:",
-        err.response ? err.response.data : err.message
-      );
-    });
-};
+
 export default function login() {
-  const [first, setfirst] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const handleLogin = () => {
+    axios
+      .post("http://localhost:5000/users/login", {
+        email,
+        password
+      })
+      .then((result) => {
+        console.log("Login successful:", result.data);
+        dispatch(setUserId.data.id);
+        dispatch(result.data.token);
+      })
+      .catch((err) => {
+        console.error(
+          "Login failed:",
+          err.response ? err.response.data : err.message
+        );
+      });
+  };
+
   const dispatch = useAppDispatch();
   const { isLoggedIn, token } = useAppSelector((state) => {
     return {
@@ -65,6 +69,9 @@ export default function login() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="name@company.com"
                     required=""
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
                   />
                 </div>
                 <div>
@@ -81,6 +88,7 @@ export default function login() {
                     placeholder="••••••••"
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required=""
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -113,13 +121,14 @@ export default function login() {
                 <button
                   type="submit"
                   className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  onClick={handleLogin}
                 >
                   Sign in
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
                   <a
-                    href="#"
+                    href="/register"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >
                     Sign up

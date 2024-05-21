@@ -94,6 +94,6 @@ const createTable = (req, res) => {
       console.log(err.message);
     });
 };
-//createTable()
+// createTable()
 
 module.exports = { pool };

@@ -15,4 +15,4 @@ ticketRouter.get("/all/:id",selectTicketByUserId);
 ticketRouter.post("/favorite/:id",favoriteTicket);
 ticketRouter.delete("/favorite/delete/:id",removeFavoriteTicket);
 
-module.exports = ticketRouter;
+module.exports = ticketRouter; 
