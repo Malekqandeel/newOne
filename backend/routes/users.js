@@ -12,5 +12,5 @@ usersRouter.post("/login", login);
 usersRouter.put("/update/:id", updateUserById);
 usersRouter.get("/:id", getUserById);
 
-module.exports = usersRouter;
+module.exports = usersRouter; 
  
