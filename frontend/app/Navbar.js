@@ -35,8 +35,8 @@ export default function Navbar() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeIinecap="round"
+                  strokeIinejoin="round"
                   stroke-width="2"
                   d="M1 1h15M1 7h15M1 13h15"
                 />
