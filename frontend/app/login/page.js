@@ -1,6 +1,8 @@
 "use client";
 import axios from "axios";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
+import { setUserId } from "../lib/features/auth";
 const handleLogin = (email, password) => {
   axios
     .post("http://localhost:5000/users/login", {
@@ -9,6 +11,7 @@ const handleLogin = (email, password) => {
     })
     .then((result) => {
       console.log("Login successful:", result.data);
+      dispatch(setUserId.data);
     })
     .catch((err) => {
       console.error(
@@ -18,6 +21,15 @@ const handleLogin = (email, password) => {
     });
 };
 export default function login() {
+  const [first, setfirst] = useState("");
+  const dispatch = useAppDispatch();
+  const { isLoggedIn, token } = useAppSelector((state) => {
+    return {
+      token: state.auth.token,
+      isLoggedIn: state.auth.isLoggedIn
+    };
+  });
+
   return (
     <>
       <section className="bg-gray-50 dark:bg-gray-900 ">
