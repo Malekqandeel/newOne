@@ -6,7 +6,7 @@ const register = async (req, res) => {
   const role_id = "1";
   const bcryptPassword = await bcrypt.hash(password, 7);
   const query =
-    "INSERT INTO users (first_name,last_name ,email ,password) VALUES ($1,$2,$3,$4) returning *;";
+    "INSERT INTO users (first_name,last_name ,email ,password) VALUES ($1,$2,$3,$4)";
   const values = [first_name, last_name, email.toLowerCase(), bcryptPassword];
   pool
     .query(query, values)
@@ -52,8 +52,7 @@ const login = (req, res) => {
                 token,
                 success: true,
                 message: `Valid login credentials`,
-                userId: result.rows[0].id,
-                
+                userId: result.rows[0].id
               });
             } else {
               throw Error;
@@ -111,4 +110,4 @@ const updateUserById = (req, res) => {
       console.log(err);
     });
 };
-module.exports = { register, login, getUserById,updateUserById };
+module.exports = { register, login, getUserById, updateUserById };
