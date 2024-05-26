@@ -1,26 +1,19 @@
-
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-
-
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAVpRe0RIdiZQs6sQUE2Zneo3F8ew9GYOQ",
-  authDomain: "new-one-57b43.firebaseapp.com",
-  projectId: "new-one-57b43",
-  storageBucket: "new-one-57b43.appspot.com",
-  messagingSenderId: "627233056977",
-  appId: "1:627233056977:web:4aa66a2e7eef26e1b83df0",
-  measurementId: "G-EL50CHH05M"
+  apiKey: "AIzaSyC1lXSkixnIDnl3it35qkGvP9trwcZkng8",
+  authDomain: "photonotnull.firebaseapp.com",
+  projectId: "photonotnull",
+  storageBucket: "photonotnull.appspot.com",
+  messagingSenderId: "569559975269",
+  appId: "1:569559975269:web:686c18a5f89b6fc94b4d8c"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-export { auth, db, storage };
+export const storage = getStorage(app);
