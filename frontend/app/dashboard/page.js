@@ -1,20 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
 import axios from "axios";
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
-import { createTicket } from "../lib/features/ticket";
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { createTicket, setTickets } from "../lib/features/ticket";
 import { storage } from '../firebase';
+import React, { useState, useEffect } from "react";
+import { ref, uploadBytes,uploadBytesResumable, listAll, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
 
 
 export default function Dashboard () {
   const dispatch = useAppDispatch();
-  const { isLoggedIn, token } = useAppSelector((state) => {
+  const { isLoggedIn, token,ticket } = useAppSelector((state) => {
     return {
       token: state.auth.token,
       isLoggedIn: state.auth.isLoggedIn,
-
+      ticket:state.tickets.tickets,
     };
   });
 
@@ -31,24 +32,51 @@ export default function Dashboard () {
   const [progress, setProgress] = useState(0);
   const [imageUrl, setImageUrl] = useState('');
   const [time, setTime] = useState('');
+  const [imageUpload, setImageUpload] = useState(null);
+  const [imageList, setImageList] = useState([]);
+  const imageListRef = ref(storage, `images/`);
+  const uploadImage = () => {
+    if (imageUpload === null) return;
+    console.log(imageUpload);
+    const imageRef = ref(storage, `images/${imageUpload.name + v4()}`);
+    uploadBytes(imageRef, imageUpload).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        setImageUpload((prev) => {
+          return [prev, url];
+        });
+        console.log("images upload");
+      });
+    });
+  };
+  useEffect(() => {
+    listAll(imageListRef).then((response) => {
+      response.items.forEach((item) => {
+        getDownloadURL(item).then((url) => {
+          setImageList((prev) => [...prev, url]);
+        });
+      });
+    });
+  }, []);
 
-  const getAllTickets =()=>{
+  useEffect(() => {
     axios.get(`http://localhost:5000/tickets/all`,
   {
     headers: {
-      authorization: `Bearer ${token || localStorage.getItem("token")}`
+      authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJ1c2VybmFtZSI6Im1AZ21haWwuY29tIiwicm9sZSI6bnVsbCwiaWF0IjoxNzE2ODUxMDU3LCJleHAiOjE3MTY5Mzc0NTd9.CLUlX52Cb28J8itiL01AViJ7GVqEtDZ0sEABF6A72Tg`
     }
   })
   .then((result) => {
-    console.log(result);
-    
+    console.log(result.data.result.rows);
+    dispatch(setTickets(result.data.result.rows))
   })
   .catch((err) => {
     console.error(
       err.response ? err.response.data : err.message
     );
   });
-  }
+  }, []);
+
+  //console.log(ticket);
 
   const handleChangeTime = (e) => {
     setTime(e.target.value);
@@ -59,49 +87,21 @@ export default function Dashboard () {
       setFile(e.target.files[0]);
     }
   };
-
-  const handleUpload = () => {
-    if (!file) return;
-
-    const storageRef = ref(storage, `images/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgress(progress);
-      },
-      (error) => {
-        console.error(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageUrl(downloadURL);
-          console.log('File available at', downloadURL);
-        });
-      }
-    );
-  };
+  
 const createTicketFun = ()=>{
   axios.post(`http://localhost:5000/tickets/create`,{
-        title,
-        body,
         photo,
         cover,
         priority,
-        user_id :localStorage.getItem("userId")
   },
   {
     headers: {
-      authorization: `Bearer ${token || localStorage.getItem("token")}`
+      authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJ1c2VybmFtZSI6Im1AZ21haWwuY29tIiwicm9sZSI6bnVsbCwiaWF0IjoxNzE2ODUxMDU3LCJleHAiOjE3MTY5Mzc0NTd9.CLUlX52Cb28J8itiL01AViJ7GVqEtDZ0sEABF6A72Tg`
     }
   })
   .then((result) => {
     console.log(result);
-    
+    dispatch(createTicket(result.data.result.rows))
   })
   .catch((err) => {
     console.error(
@@ -139,41 +139,50 @@ const createTicketFun = ()=>{
             <div className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl rtl:text-right dark:bg-gray-900 sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
               
               
-<form>
+<div>
     <div className="grid gap-6 mb-6 md:grid-cols-2"> 
   
     </div>
     <div className="mb-6">
-        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-        <input type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Title" 
+        <label for="text" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+        <input type="text" id="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Title" 
                     onChange={(e) => {
                       setTitle(e.target.value);
-                    }} required />
+                    }}  />
     </div> 
     
     <div className="mb-6">
-        <label for="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description </label>
-        <input type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Description" 
+        <label for="text" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description </label>
+        <input type="text" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Description" 
                     onChange={(e) => {
                       setBody(e.target.value);
-                    }} required />
+                    }} F />
     </div> 
 
     <div className="mb-6">
 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload photo</label>
-<input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" onChange={handleChange}/>
+<input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" onChange={(e) => {
+          setImageUpload(e.target.files[0]);
+        }}/>
 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
-<button onClick={handleUpload}>Upload</button>
-      <div>Progress: {progress}%</div>
-      {imageUrl && <img src={imageUrl} alt="Uploaded" width="100" height="100" />}
+<button onClick={()=>(
+  uploadImage())}>Upload</button>
+      {/* <div>Progress: {progress}%</div> */}
+     {/*  {imageUrl && <img src={imageUrl} alt="Uploaded" width="100" height="100" />} */}
    
     <div className="mb-6">
 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload cover</label>
-<input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" onClick={handleUpload}/>
+<input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="file_input" type="file" onChange={(e) => {
+          setImageUpload(e.target.files[0]);
+        }}/>
 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
-<button onClick={handleUpload}>Upload</button>
-      <div>Progress: {progress}%</div>
-      {imageUrl && <img src={imageUrl} alt="Uploaded" width="100" height="100" />}
+<button onClick={()=>{uploadImage()
+setTimeout(() => {
+  console.log(imageUrl)
+}, 5000);
+  }}>Upload</button>
+      {/* <div>Progress: {progress}%</div> */}
+   {/*    {imageUrl && <img src={imageUrl} alt="Uploaded" width="100" height="100" />} */}
    
     </div> 
 <form class="max-w-sm mx-auto">
@@ -203,12 +212,12 @@ const createTicketFun = ()=>{
     </div> 
     <div className="flex items-start mb-6">
         <div className="flex items-center h-5">
-        <input id="remember" type="checkbox" value="" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required />
+        <input id="remember" type="checkbox" value="" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"  />
         </div>
         <label for="remember" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree with the <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">terms and conditions</a>.</label>
     </div>
     <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={createTicketFun()}>Submit</button>
-</form>
+</div>
 
                 <div className="sm:flex sm:items-center ">
                   <button
@@ -224,63 +233,68 @@ const createTicketFun = ()=>{
       )}
             </div>
         </div>
+{ticket.map((tick)=>{
+  return  <div class="grid gap-6 mt-16 -mx-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  <div class="px-6 py-4 transition-colors duration-300 transform rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+      <p class="text-lg font-medium text-gray-800 dark:text-gray-100">Your Ticket #{tick.id} </p>
 
-        <div class="grid gap-6 mt-16 -mx-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <div class="px-6 py-4 transition-colors duration-300 transform rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
-                <p class="text-lg font-medium text-gray-800 dark:text-gray-100">Intro</p>
+      <h4 class="mt-2 text-3xl font-semibold text-gray-800 dark:text-gray-100">$19 <span class="text-base font-normal text-gray-600 dark:text-gray-400">/ Month</span></h4>
+      
+      <p class="mt-4 text-gray-500 dark:text-gray-300">For most businesses that want to optimaize web queries.</p>
 
-                <h4 class="mt-2 text-3xl font-semibold text-gray-800 dark:text-gray-100">$19 <span class="text-base font-normal text-gray-600 dark:text-gray-400">/ Month</span></h4>
-                
-                <p class="mt-4 text-gray-500 dark:text-gray-300">For most businesses that want to optimaize web queries.</p>
+      <div class="mt-8 space-y-8">
+          <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
 
-                <div class="mt-8 space-y-8">
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+              <span class="mx-4 text-gray-700 dark:text-gray-300">All limited links</span>
+          </div>
 
-                        <span class="mx-4 text-gray-700 dark:text-gray-300">All limited links</span>
-                    </div>
+          <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
 
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+              <span class="mx-4 text-gray-700 dark:text-gray-300">Own analytics platform</span>
+          </div>
 
-                        <span class="mx-4 text-gray-700 dark:text-gray-300">Own analytics platform</span>
-                    </div>
+          <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
 
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+              <span class="mx-4 text-gray-700 dark:text-gray-300">Chat support</span>
+          </div>
 
-                        <span class="mx-4 text-gray-700 dark:text-gray-300">Chat support</span>
-                    </div>
+          <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
 
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+              <span class="mx-4 text-gray-700 dark:text-gray-300">Optimize hashtags</span>
+          </div>
 
-                        <span class="mx-4 text-gray-700 dark:text-gray-300">Optimize hashtags</span>
-                    </div>
+          <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
 
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+              <span class="mx-4 text-gray-700 dark:text-gray-300">Unlimited users</span>
+          </div>
+      </div>
 
-                        <span class="mx-4 text-gray-700 dark:text-gray-300">Unlimited users</span>
-                    </div>
-                </div>
+      <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+          Update Ticket
+      </button>
+      <button class="w-full px-4 mt-5 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600">
+          Delete
+      </button>
+  </div>
 
-                <button class="w-full px-4 py-2 mt-10 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
-                    Choose plan
-                </button>
-            </div>
-
-        </div>
+</div>
+})
+       }
     </div>
 </section>
   
