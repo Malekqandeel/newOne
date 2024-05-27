@@ -3,17 +3,17 @@ import { createSlice } from "@reduxjs/toolkit";
 export const ticket = createSlice({
   name: "ticket",
   initialState: {
-    ticket:[],
+    tickets:[],
   },
   reducers: {
     setTickets: (state, action) => {
         state.tickets = action.payload;
       },
       createNewTicket: (state, action) => {
-        state.tickets = [action.payload, ...state.ticket];
+        state.tickets = [action.payload, ...state.tickets];
       },
       updateTicketById: (state, action) => {
-        state.tickets = state.ticket.map((elem, ind) => {
+        state.tickets = state.tickets.map((elem, ind) => {
           if (elem.id === action.payload.id) {
             console.log(action.payload);
             return { ...elem, ...action.payload };
@@ -22,7 +22,7 @@ export const ticket = createSlice({
         });
       },
       deleteTicket: (state, action) => {
-        state.tickets = state.ticket.filter(
+        state.tickets = state.tickets.filter(
           (id, index) => id.id !== action.payload
         )
       },

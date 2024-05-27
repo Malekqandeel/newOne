@@ -37,6 +37,9 @@ export default function page() {
         }}
       />
       <button onClick={uploadImage}>upload</button>
+      {imageList.map((elem) => {
+        return <img src={elem} />;
+      })}
     </div>
   );
 }
