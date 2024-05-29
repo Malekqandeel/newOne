@@ -30,7 +30,7 @@ const register = async (req, res) => {
 const login = (req, res) => {
   const { email } = req.body;
   const { password } = req.body;
-  const query = `SELECT * FROM users WHERE email  = $1`;
+  const query = `SELECT * FROM users WHERE email = $1`;
   const data = [email.toLowerCase()];
   pool
     .query(query, data)
@@ -110,4 +110,53 @@ const updateUserById = (req, res) => {
       console.log(err);
     });
 };
-module.exports = { register, login, getUserById, updateUserById };
+const registerCompany = async (req, res) => {
+  const { companyName, email, password } = req.body;
+  const role_id = "2";
+  const bcryptPassword = await bcrypt.hash(password, 7);
+  const query =
+    "INSERT INTO company (companyName ,email ,password) VALUES ($1,$2,$3) ";
+  const values = [companyName, email.toLowerCase(), bcryptPassword];
+  pool
+    .query(query, values)
+    .then((result) => {
+      res.status(200).json({
+        success: true,
+        message: "created email successfully",
+        result: result.rows[0]
+      });
+    })
+    .catch((err) => {
+      res.status(409).json({
+        success: false,
+        massage: "The company already exited",
+        err: err.message
+      });
+      console.log(err);
+    });
+};
+
+const getUserCompanyById = (req, res) => {
+  const { id } = req.params;
+  const query = `SELECT * FROM users_company WHERE id= $1`;
+  pool
+    .query(query, [id])
+    .then((result) => {
+      res.status(200).json({
+        message: `users id = ${id}`,
+        result: result.rows
+      });
+    })
+    .catch((err) => {
+      res.status(500).json(err.message);
+      console.log(err);
+    });
+};
+module.exports = {
+  registerCompany,
+  getUserCompanyById,
+  register,
+  login,
+  getUserById,
+  updateUserById
+};
