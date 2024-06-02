@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
-import { createTicket, setTickets, updateTicketById } from "../lib/features/ticket";
+import { createTicket, deleteTicket, setTickets, updateTicketById } from "../lib/features/ticket";
 import { storage } from '../firebase';
 import React, { useState, useEffect } from "react";
 import { ref, uploadBytes,uploadBytesResumable, listAll, getDownloadURL } from "firebase/storage";
@@ -90,9 +90,12 @@ export default function Dashboard () {
   
 const createTicketFun = ()=>{
   axios.post(`http://localhost:5000/tickets/create`,{
+    title,
         photo,
         cover,
+        description,
         priority,
+        end_at
   },
   {
     headers: {
@@ -112,9 +115,12 @@ const createTicketFun = ()=>{
 
 const updateTicketFun = (id)=>{
   axios.put(`http://localhost:5000/tickets/update/${id}`,{
-        photo,
-        cover,
-        priority,
+    title,
+    photo,
+    cover,
+    description,
+    priority,
+    end_at
   },
   {
     headers: {
@@ -123,7 +129,24 @@ const updateTicketFun = (id)=>{
   })
   .then((result) => {
     //console.log(result);
-    //dispatch(updateTicketById(result.data.result.rows))
+    dispatch(updateTicketById(result.data.result.rows))
+  })
+  .catch((err) => {
+    console.error(
+      err.response ? err.response.data : err.message
+    );
+  });
+}
+
+const deleteTicketFun = (id)=>{
+  axios.delete(`http://localhost:5000/tickets/delete/${id}`,
+  {
+    headers: {
+      authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJ1c2VybmFtZSI6Im1AZ21haWwuY29tIiwicm9sZSI6bnVsbCwiaWF0IjoxNzE2OTQ3NDEyLCJleHAiOjE3MTcwMzM4MTJ9.lu53XG2SvWWsH3NNJIgCiwKXZn9_bhXNyseXJWO0_eI`
+    }
+  }).then((result) => {
+    //console.log(result);
+    dispatch(deleteTicket(id))
   })
   .catch((err) => {
     console.error(
