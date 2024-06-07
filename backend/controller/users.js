@@ -75,6 +75,54 @@ const login = (req, res) => {
       });
     });
 };
+const loginCompany = (req, res) => {
+  const { email } = req.body;
+  const { password } = req.body;
+  const query = `SELECT * FROM company WHERE email = $1`;
+  const data = [email.toLowerCase()];
+  pool
+    .query(query, data)
+    .then((result) => {
+      if (result.rows.length) {
+        bcrypt.compare(password, result.rows[0].password, (err, response) => {
+          if (err) res.json(err);
+          if (response) {
+            const payload = {
+              userId: result.rows[0].id,
+              username: result.rows[0].email,
+              role: result.rows[0].role_id
+            };
+            const options = { expiresIn: "1d" };
+            const secret = process.env.SECRET;
+            const token = jwt.sign(payload, secret, options);
+            if (token) {
+              return res.status(200).json({
+                token,
+                success: true,
+                message: `Valid loginCompany credentials`,
+                userId: result.rows[0].id
+              });
+            } else {
+              throw Error;
+            }
+          } else {
+            res.status(403).json({
+              success: false,
+              message: `The email doesn’t exist or the password you’ve entered is incorrect`
+            });
+          }
+        });
+      } else throw Error;
+    })
+    .catch((err) => {
+      res.status(403).json({
+        success: false,
+        message:
+          "The email doesn’t exist or the password you’ve entered is incorrect",
+        err
+      });
+    });
+};
 
 const getUserById = (req, res) => {
   const { id } = req.params;
@@ -158,5 +206,6 @@ module.exports = {
   register,
   login,
   getUserById,
-  updateUserById
+  updateUserById,
+  loginCompany
 };

@@ -14,13 +14,36 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [companyLogin, setCompanyLogin] = useState(true);
+  const [emailCompany, setEmailCompany] = useState("");
+  const [passwordCompany, setPasswordCompany] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLoginUser = (e) => {
     e.preventDefault(); // Prevent form submission default behavior
     axios
       .post("http://localhost:5000/users/login", {
         email,
         password
+      })
+      .then((result) => {
+        console.log("Login successful:", result.data);
+        dispatch(setUserId(result.data.userId));
+        dispatch(setLogin(result.data.token));
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("userId", result.data.userId);
+      })
+      .catch((err) => {
+        console.error(
+          "Login failed:",
+          err.response ? err.response.data : err.message
+        );
+      });
+  };
+  const handleLoginCompany = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:5000/users/loginCompany", {
+        email: emailCompany,
+        password: passwordCompany
       })
       .then((result) => {
         console.log("Login successful:", result.data);
@@ -56,15 +79,15 @@ export default function Login() {
               <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                 <button
                   className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
-                  onClick={() => setCompanyLogin(!companyLogin)}
-                  aria-expanded={!companyLogin}
+                  onClick={() => setCompanyLogin(false)}
+                  aria-expanded={false}
                   aria-controls="login-form"
                 >
                   companyLogin
                 </button>
                 <form
                   className="space-y-4 md:space-y-6"
-                  onSubmit={handleLogin}
+                  onSubmit={handleLoginCompany}
                   id="login-form"
                 >
                   <div>
@@ -81,7 +104,7 @@ export default function Login() {
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="name@company.com"
                       required
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => setEmailCompany(e.target.value)}
                       aria-required="true"
                     />
                   </div>
@@ -99,7 +122,7 @@ export default function Login() {
                       placeholder="••••••••"
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       required
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => setPasswordCompany(e.target.value)}
                       aria-required="true"
                     />
                   </div>
@@ -167,15 +190,15 @@ export default function Login() {
               <div className=" p-6 space-y-4 md:space-y-6 sm:p-8">
                 <button
                   className="text-xl font-bold leading-tight  tracking-tight text-gray-900 md:text-2xl dark:text-white"
-                  onClick={() => setCompanyLogin(!companyLogin)}
-                  aria-expanded={!companyLogin}
+                  onClick={() => setCompanyLogin(true)}
+                  aria-expanded={true}
                   aria-controls="login-form"
                 >
                   Users Login
                 </button>
                 <form
                   className="space-y-4 md:space-y-6"
-                  onSubmit={handleLogin}
+                  onSubmit={handleLoginUser}
                   id="login-form"
                 >
                   <div>
