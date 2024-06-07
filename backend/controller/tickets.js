@@ -1,13 +1,17 @@
 const {pool} = require('../models/db');
 
 const createTicket = (req,res)=>{
-    const {photo,
+    const {
+      title,
+      photo,
         cover,
-        priority} = req.body;
-        console.log(req.token);
+        description,
+        priority,
+      end_at} = req.body;
+        //console.log(req.token);
     const user_id = req.token.userId;
-    const data = [photo, cover || null, user_id,priority|| null];
-    const query = "INSERT INTO tickets (photo, cover,user_id,priority) VALUES ($1,$2,$3,$4) returning *;";
+    const data = [title,photo, cover || null,description, user_id,priority,end_at|| null];
+    const query = "INSERT INTO tickets (title,photo, cover,description,user_id,priority,end_at) VALUES ($1,$2,$3,$4,$5,$6,$7) returning *;";
 
     pool
     .query(query, data)
@@ -41,14 +45,16 @@ const deleteTicket = (req,res)=>{
 
 const updateTicket = (req,res)=>{
     const {ticket_id} = req.params;
-    const {cover,
-    priority, 
-    photo,
+    const {title,
+      photo,
+      cover,
+      description,
+      priority,
     end_at} = req.body;
     const user_id = req.token.userId;
   
-    const query = "UPDATE tickets SET photo = COALESCE($1,photo), cover = COALESCE($2, cover),priority = COALESCE($3, priority) ,end_at = COALESCE($4,end_at) WHERE id=$5 AND is_deleted = 0  RETURNING *";
-    const data=[photo,cover,priority,end_at,ticket_id];
+    const query = "UPDATE tickets SET title = COALESCE($1,title),photo = COALESCE($2,photo), cover = COALESCE($3, cover),description = COALESCE($4,description),priority = COALESCE($5, priority) ,end_at = COALESCE($6,end_at) WHERE id=$7 AND is_deleted = 0  RETURNING *";
+    const data=[title,photo,cover,description,priority,end_at,ticket_id];
 
     pool
     .query(query, data)
