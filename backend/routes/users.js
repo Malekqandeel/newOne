@@ -4,7 +4,8 @@ const {
   login,
   updateUserById,
   getUserById,
-  registerCompany
+  registerCompany,
+  loginCompany
 } = require("../controller/users");
 
 const usersRouter = express.Router();
@@ -13,5 +14,6 @@ usersRouter.post("/login", login);
 usersRouter.put("/update/:id", updateUserById);
 usersRouter.get("/:id", getUserById);
 usersRouter.post("/registerCompany", registerCompany);
+usersRouter.post(`/loginCompany`, loginCompany);
 
 module.exports = usersRouter;
