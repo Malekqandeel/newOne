@@ -2,16 +2,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./features/userSlice";
 import authReducer from "./features/auth";
-import ticketReducer from './features/ticket'
+import ticketReducer from './features/ticket';
+import messageReducer from "./features/message"
 export const store = configureStore({
   reducer: {
     user: userReducer,
     auth: authReducer,
-    tickets: ticketReducer
+    tickets: ticketReducer,
+    message: messageReducer
   }
 });
-// export const store = () => {
-//   return configureStore({
-//     reducer: {}
-//   });
-// };
