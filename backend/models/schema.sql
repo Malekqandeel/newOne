@@ -16,27 +16,15 @@ CREATE TABLE role_permission (
   FOREIGN KEY (permission_id) REFERENCES permissions(id)
 );
 
-CREATE TABLE company (
-  id SERIAL PRIMARY KEY,
-  companyName VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,
-  role_id INT,
-  is_deleted SMALLINT DEFAULT 0,
-  FOREIGN KEY (role_id) REFERENCES roles(id)
-);
-
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   photo VARCHAR(255),
-  first_name VARCHAR(255) NOT NULL,
-  last_name VARCHAR(255) NOT NULL,
+  username VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  company_id INT,
+  user_type VARCHAR(255),
   role_id INT,
   is_deleted SMALLINT DEFAULT 0,
-  FOREIGN KEY (company_id) REFERENCES company(id),
   FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
