@@ -58,3 +58,44 @@ CREATE TABLE favorites (
   ticket_id INT,
   FOREIGN KEY (ticket_id) REFERENCES tickets(id)
 );
+INSERT INTO roles (role)
+VALUES ('company');
+INSERT INTO permissions (permission)
+VALUES ('CREATE_USER');
+INSERT INTO permissions (permission)
+VALUES ('UPDATE_TICKET');
+INSERT INTO permissions (permission)
+VALUES ('DELETE_USER');
+INSERT INTO permissions (permission)
+VALUES ('CREATE_TICKET');
+INSERT INTO permissions (permission)
+VALUES ('DELETE_TICKET');
+INSERT INTO permissions (permission)
+VALUES ('UPDATE_USER');
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 1);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 2);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 3);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 4);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 5);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 6);
+INSERT INTO roles (role)
+VALUES ('USER');
+INSERT INTO permissions (permission)
+VALUES ('CREATE_TICKET');
+INSERT INTO permissions (permission)
+VALUES ('UPDATE_TICKET');
+INSERT INTO permissions (permission)
+VALUES ('DELETE_USER');
+
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 1);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 2);
+INSERT INTO role_permission (role_id, permission_id)
+VALUES (1, 3);
