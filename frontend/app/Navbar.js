@@ -1,4 +1,7 @@
 "use client";
+
+import img from './images/Logo.png'
+
 export default function Navbar() {
     return (
       <>
@@ -9,9 +12,9 @@ export default function Navbar() {
               className="flex items-center space-x-3 rtl:space-x-reverse -ml-64"
             >
               <img
-                src="https://flowbite.com/docs/images/logo.svg"
+                src={img}
                 className="h-8"
-                alt="Flowbite Logo"
+                alt="Logo"
               />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
                 Flowbite
