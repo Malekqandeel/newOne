@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "./Navbar";
 import StoreProvider from "./StoreProvider";
 import { store } from "./lib/store";
+import Footer from "./Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
         <StoreProvider store={store}>
           <Navbar />
           {children}
+          <Footer />
         </StoreProvider>
       </body>
     </html>
