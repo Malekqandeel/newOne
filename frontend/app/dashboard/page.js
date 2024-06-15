@@ -24,6 +24,7 @@ export default function Dashboard() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [show, setShow] = useState(false);
+  const [drop, setDrop] = useState(false)
   const [file, setFile] = useState(null);
 
   const [progress, setProgress] = useState(0);
@@ -45,6 +46,9 @@ export default function Dashboard() {
     });
   };
 
+  const toggleDropdown = () => {
+    setDrop(!drop);
+  };
   const toggleDrawer = () => {
     setShow(!show);
   };
@@ -140,7 +144,7 @@ export default function Dashboard() {
 
   const deleteTicketFun =(id)=>{
     axios
-      .put(
+      .delete(
         `http://localhost:5000/tickets/delete/${id}`,
         {
           headers: {
@@ -149,8 +153,8 @@ export default function Dashboard() {
         }
       )
       .then((result) => {
-        //console.log(result);
-        dispatch(deleteTicket(result.data.result.rows))
+        console.log(result);
+        dispatch(deleteTicket(id))
       })
       .catch((err) => {
         console.error(err.response ? err.response.data : err.message);
@@ -446,58 +450,81 @@ export default function Dashboard() {
                             </div>
                           </td>
                           <td className="px-4 py-4 text-sm whitespace-nowrap">
-                            <div>
-                              
-<button id="dropdownHelperButton" data-dropdown-toggle="dropdownHelper" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">state <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-</svg>
-</button>
+                          <div>
+      <button 
+        id="dropdownHelperButton" 
+        onClick={toggleDropdown} 
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" 
+        type="button"
+      >
+        state 
+        <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
 
-<div id="dropdownHelper" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600">
-    <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHelperButton">
-      <li>
-        <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-          <div class="flex items-center h-5">
-              <input id="helper-checkbox-1" aria-describedby="helper-checkbox-text-1" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
-          </div>
-          <div class="ms-2 text-sm">
-              <label for="helper-checkbox-1" class="font-medium text-gray-900 dark:text-gray-300">
-                <div>Enable notifications</div>
-                <p id="helper-checkbox-text-1" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
-              </label>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-          <div class="flex items-center h-5">
-              <input id="helper-checkbox-2" aria-describedby="helper-checkbox-text-2" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
-          </div>
-          <div class="ms-2 text-sm">
-              <label for="helper-checkbox-2" class="font-medium text-gray-900 dark:text-gray-300">
-                <div>Enable 2FA auth</div>
-                <p id="helper-checkbox-text-2" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
-              </label>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-          <div class="flex items-center h-5">
-              <input id="helper-checkbox-3" aria-describedby="helper-checkbox-text-3" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>
-          </div>
-          <div class="ms-2 text-sm">
-              <label for="helper-checkbox-3" class="font-medium text-gray-900 dark:text-gray-300">
-                <div>Subscribe newsletter</div>
-                <p id="helper-checkbox-text-3" class="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
-              </label>
-          </div>
-        </div>
-      </li>
-    </ul>
-</div>
-
-                            </div>
+      <div id="dropdownHelper" className={`z-10 ${drop ? 'block' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow w-60 dark:bg-gray-700 dark:divide-gray-600`}>
+        <ul className="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHelperButton">
+          <li>
+            <div className="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div className="flex items-center h-5">
+                <input 
+                  id="helper-checkbox-1" 
+                  aria-describedby="helper-checkbox-text-1" 
+                  type="checkbox" 
+                  value="" 
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div className="ms-2 text-sm">
+                <label htmlFor="helper-checkbox-1" className="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Enable notifications</div>
+                  <p id="helper-checkbox-text-1" className="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div className="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div className="flex items-center h-5">
+                <input 
+                  id="helper-checkbox-2" 
+                  aria-describedby="helper-checkbox-text-2" 
+                  type="checkbox" 
+                  value="" 
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div className="ms-2 text-sm">
+                <label htmlFor="helper-checkbox-2" className="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Enable 2FA auth</div>
+                  <p id="helper-checkbox-text-2" className="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div className="flex p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+              <div className="flex items-center h-5">
+                <input 
+                  id="helper-checkbox-3" 
+                  aria-describedby="helper-checkbox-text-3" 
+                  type="checkbox" 
+                  value="" 
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div className="ms-2 text-sm">
+                <label htmlFor="helper-checkbox-3" className="font-medium text-gray-900 dark:text-gray-300">
+                  <div>Subscribe newsletter</div>
+                  <p id="helper-checkbox-text-3" className="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p>
+                </label>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
                           </td>
                         </tr>
                       ))}
@@ -528,7 +555,7 @@ export default function Dashboard() {
                 <span class="text-sm text-gray-500 dark:text-gray-400">{item.description}</span>
                 <div class="flex mt-4 md:mt-6">
                     <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={toggleDrawer} >UPDATE</a>
-                    <button class="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={deleteTicketFun(item.id)}>DELETE</button>
+                    <button class="py-2 px-4 ms-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={()=>(deleteTicketFun(item.id))}>DELETE</button>
                 </div>
             </div>
         </div>
@@ -686,7 +713,7 @@ export default function Dashboard() {
                       <div className="mt-5 sm:mt-6">
                         <button
                           onClick={()=>{
-                            updateTicketById()
+                            updateTicketFun()
                             setShow(false)
                           }
                           }
