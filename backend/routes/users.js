@@ -4,16 +4,15 @@ const {
   login,
   updateUserById,
   getUserById,
-  registerCompany,
-  loginCompany
+  getUserByToken
 } = require("../controller/users");
+const authentication = require("../middleware/authentication");
 
 const usersRouter = express.Router();
 usersRouter.post("/register", register);
 usersRouter.post("/login", login);
-usersRouter.put("/update/:id", updateUserById);
+usersRouter.put("/update", authentication, updateUserById);
 usersRouter.get("/:id", getUserById);
-usersRouter.post("/registerCompany", registerCompany);
-usersRouter.post(`/loginCompany`, loginCompany);
+usersRouter.get("/", authentication, getUserByToken);
 
 module.exports = usersRouter;
