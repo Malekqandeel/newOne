@@ -16,6 +16,7 @@ export default function Navbar() {
     isLoggedIn: state.auth.isLoggedIn,
     user: state.user.user
   }));
+
   const userInfo = () => {
     axios
       .get("http://localhost:5000/users", {
@@ -30,15 +31,18 @@ export default function Navbar() {
         console.log(err.message);
       });
   };
+
   useEffect(() => {
     userInfo();
   }, []);
+
   const logout = () => {
     dispatch(setLogout());
   };
+
   return (
     <>
-      <nav className="bg-gray-800">
+      <nav className="bg-gray-500">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -86,7 +90,7 @@ export default function Navbar() {
               <div className="flex flex-shrink-0 items-center">
                 <img
                   className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                  src="https://i.ibb.co/MR2tFCg/Logo.png"
                   alt="Your Company"
                 />
               </div>
@@ -100,7 +104,7 @@ export default function Navbar() {
                   </a>
                   <a
                     href="/dashboard"
-                    className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                    className="rounded-md px-3 py-2 text-sm font-medium text-gray-300"
                     aria-current="page"
                   >
                     Dashboard
@@ -115,7 +119,7 @@ export default function Navbar() {
                     href="/message"
                     className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
-                    chat
+                    Chat
                   </a>
                 </div>
               </div>
@@ -159,17 +163,15 @@ export default function Navbar() {
               </div>
               <button
                 type="button"
-                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                onClick={() => {
+                  logout();
+                  router.push("/login");
+                }}
               >
                 <span className="absolute -inset-1.5"></span>
                 <span className="sr-only">View notifications</span>
-                <IoMdLogOut
-                  className="h-8 w-8 rounded-full text-white ml-4"
-                  onClick={() => {
-                    logout();
-                    router.push("/login");
-                  }}
-                />
+                <IoMdLogOut className="h-8 w-8 rounded-full ml-4 text-white " />
               </button>
             </div>
           </div>
