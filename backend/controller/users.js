@@ -132,7 +132,7 @@ const updateUserById = (req, res) => {
   const query = `UPDATE users SET email = COALESCE($1, email), username = COALESCE($2, username),photo = COALESCE($3, photo),about = COALESCE($4, about),job_title = COALESCE($5, job_title) WHERE id = $6 RETURNING *`;
   const data = [email, username, photo, about, job_title, id];
   pool
-    .query(query, data)
+    .query(query, data) 
     .then((result) => {
       res.status(202).json({
         message: `Modified user id =${id}  `,
